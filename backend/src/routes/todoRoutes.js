@@ -5,7 +5,8 @@ const {
     getTodo,
     createTodo,
     updateTodo,
-    deleteTodo
+    deleteTodo,
+    reorderTodos
 } = require('../controllers/todoController');
 
 const { protect } = require('../middleware/authMiddleware');
@@ -15,23 +16,23 @@ const router = express.Router();
 const validate = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, errors: errors.array() });
+        const errorMsg = errors.array().map(err => err.msg).join(', ');
+        return res.status(400).json({ success: false, error: errorMsg });
     }
-    next();
+    return next();
 };
 
-// All routes after this middleware are protected
 router.use(protect);
+
+router.put('/reorder', reorderTodos);
 
 router
     .route('/')
     .get(getTodos)
     .post(
-        [
-            check('title', 'Title is required').not().isEmpty(),
-            check('title', 'Title cannot be more than 100 characters').isLength({ max: 100 }),
-            validate
-        ],
+        check('title', 'Title is required').not().isEmpty(),
+        check('title', 'Title cannot be more than 100 characters').isLength({ max: 100 }),
+        validate,
         createTodo
     );
 

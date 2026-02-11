@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaCheck, FaTimes, FaUser, FaGoogle, FaGithub, FaFacebook } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -23,7 +24,6 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Validation rules
   const validationRules = {
     email: {
       required: true,
@@ -37,7 +37,6 @@ export default function Login() {
     }
   };
 
-  // Validate field
   const validateField = (name, value) => {
     const rules = validationRules[name];
     let error = '';
@@ -53,7 +52,6 @@ export default function Login() {
     return error;
   };
 
-  // Handle input change with validation
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -71,7 +69,6 @@ export default function Login() {
     }
   };
 
-  // Handle blur
   const handleBlur = (e) => {
     const { name, value } = e.target;
 
@@ -87,47 +84,46 @@ export default function Login() {
     }));
   };
 
-  // Check if form is valid
   useEffect(() => {
     const isValid = Object.keys(errors).every(key => !errors[key]) &&
       Object.values(formData).every(value => value.trim() !== '');
     setIsFormValid(isValid);
   }, [errors, formData]);
 
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Mark all fields as touched
     const allTouched = {};
     Object.keys(touched).forEach(key => {
       allTouched[key] = true;
     });
     setTouched(allTouched);
 
-    // Validate all fields
     const newErrors = {};
     Object.keys(formData).forEach(key => {
       newErrors[key] = validateField(key, formData[key]);
     });
     setErrors(newErrors);
 
-    // Check if form is valid
     const isValid = Object.values(newErrors).every(error => !error);
     if (!isValid) {
       return;
     }
 
-    // Simulate login process
     setIsLoading(true);
     try {
-      // Add your API call here
-      console.log('Logging in with:', { ...formData, rememberMe });
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
-
-      alert('Login successful!');
-      // Redirect or handle successful login here
+      const result = await login(formData.email, formData.password);
+      if (result.success) {
+        alert('Login successful!');
+        navigate('/dashboard');
+      } else {
+        alert(result.message || 'Login failed. Please check your credentials.');
+      }
     } catch (error) {
-      alert('Login failed. Please check your credentials.');
+      alert('An error occurred during login.');
     } finally {
       setIsLoading(false);
     }
@@ -137,24 +133,15 @@ export default function Login() {
     setShowPassword(!showPassword);
   };
 
-  // Social login handlers
   const handleSocialLogin = (provider) => {
-    console.log(`Logging in with ${provider}`);
-    // Add social login logic here
   };
-
-  // Forgot password handler
   const handleForgotPassword = () => {
-    console.log('Forgot password clicked');
-    // Add forgot password logic here
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Card Container */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          {/* Header Section */}
           <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-6 md:p-8">
             <h1 className="text-2xl md:text-3xl font-bold text-white text-center">
               Welcome Back
@@ -164,7 +151,6 @@ export default function Login() {
             </p>
           </div>
 
-          {/* Form Section */}
           <div className="p-6 md:p-8">
             <div className="relative mb-8">
               <div className="absolute inset-0 flex items-center">
@@ -173,7 +159,6 @@ export default function Login() {
             </div>
 
             <form onSubmit={handleLogin} className="space-y-6" noValidate>
-              {/* Email Field */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
                   <FaEnvelope className="mr-2 text-emerald-600" />
@@ -188,18 +173,18 @@ export default function Login() {
                     onBlur={handleBlur}
                     placeholder="john@example.com"
                     className={`w-full px-4 py-3 pl-11 border rounded-lg focus:outline-none focus:ring-2 transition-all ${touched.email && errors.email
-                        ? 'border-red-500 focus:ring-red-200'
-                        : touched.email && !errors.email
-                          ? 'border-emerald-500 focus:ring-emerald-200'
-                          : 'border-gray-300 focus:ring-emerald-500 focus:border-transparent'
+                      ? 'border-red-500 focus:ring-red-200'
+                      : touched.email && !errors.email
+                        ? 'border-emerald-500 focus:ring-emerald-200'
+                        : 'border-gray-300 focus:ring-emerald-500 focus:border-transparent'
                       }`}
                     disabled={isLoading}
                   />
                   <FaEnvelope className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${touched.email && errors.email
-                      ? 'text-red-500'
-                      : touched.email && !errors.email
-                        ? 'text-emerald-500'
-                        : 'text-gray-400'
+                    ? 'text-red-500'
+                    : touched.email && !errors.email
+                      ? 'text-emerald-500'
+                      : 'text-gray-400'
                     }`} />
                   {touched.email && !errors.email && formData.email && (
                     <FaCheck className="absolute right-4 top-1/2 transform -translate-y-1/2 text-emerald-500" />
@@ -216,7 +201,6 @@ export default function Login() {
                 )}
               </div>
 
-              {/* Password Field */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium text-gray-700 flex items-center">
@@ -240,18 +224,18 @@ export default function Login() {
                     onBlur={handleBlur}
                     placeholder="Enter your password"
                     className={`w-full px-4 py-3 pl-11 pr-12 border rounded-lg focus:outline-none focus:ring-2 transition-all ${touched.password && errors.password
-                        ? 'border-red-500 focus:ring-red-200'
-                        : touched.password && !errors.password
-                          ? 'border-emerald-500 focus:ring-emerald-200'
-                          : 'border-gray-300 focus:ring-emerald-500 focus:border-transparent'
+                      ? 'border-red-500 focus:ring-red-200'
+                      : touched.password && !errors.password
+                        ? 'border-emerald-500 focus:ring-emerald-200'
+                        : 'border-gray-300 focus:ring-emerald-500 focus:border-transparent'
                       }`}
                     disabled={isLoading}
                   />
                   <FaLock className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${touched.password && errors.password
-                      ? 'text-red-500'
-                      : touched.password && !errors.password
-                        ? 'text-emerald-500'
-                        : 'text-gray-400'
+                    ? 'text-red-500'
+                    : touched.password && !errors.password
+                      ? 'text-emerald-500'
+                      : 'text-gray-400'
                     }`} />
                   <button
                     type="button"
@@ -271,7 +255,6 @@ export default function Login() {
                 )}
               </div>
 
-              {/* Remember Me Checkbox */}
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -286,13 +269,12 @@ export default function Login() {
                 </label>
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={!isFormValid || isLoading}
                 className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 relative ${isFormValid && !isLoading
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
               >
                 {isLoading ? (
@@ -308,7 +290,6 @@ export default function Login() {
                 )}
               </button>
 
-              {/* Form Status */}
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">Form Status:</span>
@@ -322,7 +303,6 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Footer Note */}
         <div className="text-center mt-6 space-y-2">
           <p className="text-gray-600 text-sm">
             Don't have an account?{' '}

@@ -11,6 +11,19 @@ const TodoSchema = new mongoose.Schema({
         type: String,
         maxlength: [500, 'Description cannot be more than 500 characters']
     },
+    priority: {
+        type: String,
+        enum: ['low', 'medium', 'high'],
+        default: 'medium'
+    },
+    endDate: {
+        type: Date,
+        required: false
+    },
+    serialNumber: {
+        type: Number,
+        required: true
+    },
     status: {
         type: String,
         enum: ['pending', 'completed'],
@@ -29,12 +42,8 @@ const TodoSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-});
-
-// Update the updatedAt field before saving
-TodoSchema.pre('save', function (next) {
-    this.updatedAt = Date.now();
-    next();
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('Todo', TodoSchema);

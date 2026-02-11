@@ -1,14 +1,10 @@
 const User = require('../models/User');
 const { generateToken, generateRefreshToken } = require('../config/tokens');
 
-// @desc    Register user
-// @route   POST /api/auth/register
-// @access  Public
 exports.register = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
 
-        // Create user
         const user = await User.create({
             username,
             email,
@@ -24,14 +20,10 @@ exports.register = async (req, res, next) => {
     }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
 exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
-        // Validate email & password
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -39,7 +31,6 @@ exports.login = async (req, res, next) => {
             });
         }
 
-        // Check for user
         const user = await User.findOne({ email }).select('+password');
 
         if (!user) {
@@ -49,7 +40,6 @@ exports.login = async (req, res, next) => {
             });
         }
 
-        // Check if password matches
         const isMatch = await user.matchPassword(password);
 
         if (!isMatch) {
@@ -68,14 +58,12 @@ exports.login = async (req, res, next) => {
     }
 };
 
-// Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
-    // Create token
     const token = generateToken(user._id);
 
     const options = {
         expires: new Date(
-            Date.now() + 3600000 // 1 hour
+            Date.now() + 3600000
         ),
         httpOnly: true
     };
