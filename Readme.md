@@ -3,20 +3,20 @@
 A full-stack task management system featuring secure authentication, real-time task organization, and a premium user interface.
 
 ## 1. Project Overview
-This application provides users with a central dashboard to manage their daily objectives. It supports categorized task views (Active/Completed), priority-level highlighting, due-date tracking, and an intuitive reordering system to prioritize work effectively.
+This application provides users with a central dashboard to manage their daily objectives. It supports categorized task views (Active/Completed), priority-level highlighting, due-date tracking, and task reordering system to prioritize work effectively.
 
 ## 2. Tech Stack & Reasoning
 
 ### Frontend
-- **React (Vite)**: Chosen for high-performance rendering and a superior developer experience compared to Create React App.
+- **React (Vite)**: Chosen for high-performance rendering.
 - **Tailwind CSS**: Enabled rapid creation of a custom, premium design system without the overhead of heavy UI libraries.
 - **React Icons**: Provided a consistent, high-quality icon set for the interface.
-- **Axios**: Standardized HTTP client for cleaner API interactions and easier interceptor management (though not used here, it's prepared for growth).
+- **Axios**: Standardized HTTP client for cleaner API interactions.
 
 ### Backend
 - **Node.js & Express**: Provides a lightweight and scalable foundation for the API.
-- **MongoDB & Mongoose**: Flexible schema-based modeling that handles hierarchical task data and user relationships efficiently.
-- **JWT (JSON Web Tokens)**: Secure, stateless authentication that works seamlessly across different frontend environments.
+- **MongoDB & Mongoose**: Flexible schema-based modeling that handles task data and user relationships efficiently.
+- **JWT (JSON Web Tokens)**: Secure authentication that works seamlessly across different frontend environments.
 - **Express-Validator**: Ensures data integrity by sanitizing and validating inputs before they reach the database.
 
 ## 3. Setup Instructions
